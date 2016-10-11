@@ -94,6 +94,10 @@ public class ServerProperties extends HsqlProperties {
     static final String sc_key_web_root         = "server.root";
     static final String sc_key_max_connections  = "server.maxconnections";
     static final String sc_key_remote_open_db   = "server.remote_open";
+    static final String sc_base_dir				= "server.base_dir";
+    // TODO - get access to the create options even where no file: location specified for a new db,
+    // and this option can be removed.
+    static final String sc_default_create_options = "server.default_create_options";
     static final String sc_key_max_databases    = "server.maxdatabases";
     static final String sc_key_acl              = "server.acl";
     static final String sc_key_daemon           = "server.daemon";

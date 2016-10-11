@@ -288,7 +288,7 @@ public class Server implements HsqlSocketRequestHandler, Notified {
     private PrintWriter        errWriter;
     private ServerAcl          acl = null;    // null means no access tests
     private volatile boolean   isShuttingDown;
-
+    private volatile String	   baseDir; 
 //
 
     /**
@@ -1250,6 +1250,8 @@ public class Server implements HsqlSocketRequestHandler, Notified {
         isDaemon =
             serverProperties.isPropertyTrue(ServerProperties.sc_key_daemon);
 
+        baseDir = serverProperties.getProperty(ServerProperties.sc_base_dir);
+        
         String aclFilepath =
             serverProperties.getProperty(ServerProperties.sc_key_acl);
 
@@ -1733,7 +1735,6 @@ public class Server implements HsqlSocketRequestHandler, Notified {
      * return database ID
      */
     synchronized final int getDBIndex(String aliasPath) {
-
         int    semipos  = aliasPath.indexOf(';');
         String alias    = aliasPath;
         String filepath = null;
@@ -1746,6 +1747,19 @@ public class Server implements HsqlSocketRequestHandler, Notified {
         int dbIndex = ArrayUtil.find(dbAlias, alias);
 
         if (dbIndex == -1) {
+        	if (filepath == null && baseDir != null) {
+        		filepath = "file:" + baseDir + "/" + aliasPath;
+        		
+        		String defaultCreateOptions = 
+        				serverProperties.getProperty(ServerProperties.sc_default_create_options);
+        		
+        		if (defaultCreateOptions != null) {
+        			filepath = filepath + defaultCreateOptions;
+        		}
+        		
+        		print(aliasPath + " alias not found, setting " + filepath);
+        	}
+        	
             if (filepath == null) {
                 HsqlException e = Error.error(ErrorCode.GENERAL_ERROR,
                                               "database alias does not exist");
